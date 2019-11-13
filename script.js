@@ -1,7 +1,7 @@
 // Global variable definitions
 
 var passLengthField = document.querySelector("#passLengthField");
-var charTypeFlags = document.querySelectorAll("[type=checkbox]");
+var charTypeCheckBoxes = document.querySelectorAll("[type=checkbox]");
 var passwordTextArea = document.querySelector("#password");
 var generateButton = document.querySelector("#generate");
 var copyButton = document.querySelector("#copy");
@@ -9,92 +9,86 @@ var copyButton = document.querySelector("#copy");
 // Function definitions
 
 function getRandomInt(min, max) {
- // Taken from example at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+  // Taken from example at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 
- min = Math.ceil(min);
- max = Math.floor(max);
- return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
-function generatePassword(passLength, hasLowers, hasUppers, hasNums, hasSpecials) {
- // Generates a password based on the criteria specified
- // Parameters:
- //  passLength - Length of the password in the range 8 through 128
- //  hasLowers, hasUppers, hasNums and hasSpecials - Boolean arguments indicating which of each type of character to include in the password. At least one value must be true
- // Returns: A string representing the newly generated password
+function validateInput() {
+  // Returns true if all form fields are valid, otherwise notifies user of field in error and returns false
 
- // Validate input parameters
+  // Password length must be a number between 8 and 128
+  var passLength = parseInt(passLengthField.value);
+  if (isNaN(passLength)
+    || passLength < 8
+    || passLength > 128) {
+    alert("Password length must be a number between 8 and 128");
+    passLengthField.select();
+    return false;
+  }
 
- // Must have four parameters
- if (generatePassword.length !== arguments.length) {
-  throw "Wrong number of arguments passed to generatePassword() function.";
- }
+  // At least one character type  checkbox must be selected
+  var atLeastOneChecked = false;
+  charTypeCheckBoxes.forEach(function(chkbox) {
+    if (chkbox.checked) {
+      atLeastOneChecked = true;
+    }
+  });
+  if (!atLeastOneChecked) {
+    alert("At least one of the character types must be chosen.");
+    charTypeCheckBoxes[0].focus();
+    return false;
+  }
 
- // Password length must be a number between 8 and 128
- if (isNaN(passLength)
-  || passLength < 8
-  || passLength > 128) {
-  throw "Password length must be a number between 8 and 128";
- }
+  return true;
+}
 
- // At least one character type boolean must be true
- // Following line adapted from https://www.hacksparrow.com/javascript/convert-arguments-to-array.html
- argumentsArray = Array.prototype.slice.call(arguments);
- if (!argumentsArray.includes(true, 1)) {
-  throw "At least one of the character types must be chosen.";
- }
+function generatePassword() {
+  // Generates a password based on the criteria specified on the form and returns it as a string
 
- // If we made it this far, all input is good. Proceed to generating  password
+  var newPassword = "";
 
- var newPassword = "";
- var availableChars = "";
+  if (validateInput()) {
+    var availableChars = ["abcdefghijklmnopqrstuvwxyz",
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "0123456789",
+      " !\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~"];
+    var chosenChars = "";
 
- if (hasLowers) {
-  availableChars += "abcdefghijklmnopqrstuvwxyz";
- }
- if (hasUppers) {
-  availableChars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
- }
- if (hasNums) {
-  availableChars += "0123456789";
- }
- if (hasSpecials) {
-  availableChars += " !\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~";
- }
+    // Build a string containing the types of characters the user wants based on their checkbox selections
+    for (var i = 0; i < charTypeCheckBoxes.length; i++) {
+      if (charTypeCheckBoxes[i].checked) {
+        chosenChars += availableChars[i];
+      }
+    }
 
- for (var i = 1; i <= passLength; i++) {
-  var newChar = availableChars[getRandomInt(0, availableChars.length)];
-  newPassword += newChar;
- }
-
- return newPassword;
+    // Create a password based on the character length and types of characters the user chose
+    var passLength = parseInt(passLengthField.value);
+    for (var i = 1; i <= passLength; i++) {
+      var newChar = chosenChars[getRandomInt(0, chosenChars.length)];
+      newPassword += newChar;
+    }
+  }
+  return newPassword;
 }
 
 // Event handler for generate button
-generateButton.addEventListener("click", function(event) {
- event.preventDefault();
+generateButton.addEventListener("click", function (event) {
+  event.preventDefault();
 
- try {
-  passwordTextArea.textContent = generatePassword(
-    parseInt(passLengthField.value),
-    charTypeFlags[0].checked, // has lowercase
-    charTypeFlags[1].checked, // has uppercase
-    charTypeFlags[2].checked, // has numbers
-    charTypeFlags[3].checked // has special chars
-  );
- }
- catch (ex) {
-  alert(ex);
- }
+  passwordTextArea.textContent = generatePassword();
 });
 
 // Event handler for copy button
-copyButton.addEventListener("click", function(event) {
- event.preventDefault();
- // Code adapted from https://www.w3schools.com/howto/howto_js_copy_clipboard.asp
- passwordTextArea.select();
- passwordTextArea.setSelectionRange(0, 99999); /*For mobile devices*/
- 
- /* Copy the text inside the text field */
- document.execCommand("copy");
+copyButton.addEventListener("click", function (event) {
+  event.preventDefault();
+  
+  // Code adapted from https://www.w3schools.com/howto/howto_js_copy_clipboard.asp
+  passwordTextArea.select();
+  passwordTextArea.setSelectionRange(0, 99999); /*For mobile devices*/
+
+  /* Copy the text inside the text field */
+  document.execCommand("copy");
 });

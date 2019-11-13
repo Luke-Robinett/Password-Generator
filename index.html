@@ -16,20 +16,23 @@
       <label for="passLengthField">Password Length (8 to 128)</label><br>
       <input id="passLengthField" type="number"><br>
       <br>
+      <fieldset>
+        <legend>
+          Character Types (Must choose at least one)
+        </legend> 
 
-      Character Types (Must choose at least one)<br>
+        <input id="lowerCheckbox" type="checkbox" checked>
+        <label for="lowerCheckbox">Lowercase Letters</label><br>
 
-      <input id="lowerCheckbox" type="checkbox" checked>
-      <label for="lowerCheckbox">Lowercase Letters</label><br>
+        <input id="upperCheckbox" type="checkbox">
+        <label for="upperCheckbox">Uppercase Letters</label><br>
 
-      <input id="upperCheckbox" type="checkbox">
-      <label for="upperCheckbox">Uppercase Letters</label><br>
+        <input id="numberCheckbox" type="checkbox">
+        <label for="numberCheckbox">Numbers</label><br>
 
-      <input id="numberCheckbox" type="checkbox">
-      <label for="numberCheckbox">Numbers</label><br>
-
-      <input id="specialCheckbox" type="checkbox">
-      <label for="specialCheckbox">Special Characters</label><br>
+        <input id="specialCheckbox" type="checkbox">
+        <label for="specialCheckbox">Special Characters</label><br>
+      </fieldset>
     </form>
     <br>
     <label for="passwored">Your Generated Password</label><br>
